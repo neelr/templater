@@ -38,7 +38,7 @@ func Command(name string) {
 	if err != nil {
 		readme = []byte("")
 	}
-	req, err := newfileUploadRequest("https://d00dd8d630df.ngrok.io/api/upload", map[string]string{
+	req, err := newfileUploadRequest("https://templater-api--hacker22.repl.co/api/upload", map[string]string{
 		"name":   name,
 		"README": string(readme),
 		"state":  string(key),

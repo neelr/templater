@@ -21,7 +21,7 @@ func Command(slug string) {
 
 	log.Loading.Suffix = log.Information(" Getting template...")
 	log.Loading.Start()
-	downloadFile(tmpDir, "https://d00dd8d630df.ngrok.io/api/templates/"+slug+"/download")
+	downloadFile(tmpDir, "https://templater-api--hacker22.repl.co/api/templates/"+slug+"/download")
 	unzip(tmpDir, os.Getenv("PLATE_DIR"))
 	os.Remove(tmpDir)
 	log.Loading.Stop()
