@@ -24,7 +24,7 @@ func InformationPrint(text string) {
 
 // NormalPrint logs information
 func NormalPrint(text string) {
-	fmt.Println(Normal(text))
+	fmt.Println(text)
 }
 
 // ErrorPrint logs information

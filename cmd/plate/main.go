@@ -42,6 +42,8 @@ func main() {
 			upload.Command(os.Args[2])
 		case "get":
 			get.Command(os.Args[2])
+		case "version":
+			log.NormalPrint("plate v1.0")
 		default:
 			log.NormalPrint(helpText)
 		}
