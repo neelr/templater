@@ -4,13 +4,8 @@ import (
 	"os"
 	"path"
 
-<<<<<<< HEAD
 	log "github.com/neelr/templater/pkg/logs"
 	"github.com/neelr/templater/pkg/setup"
-=======
-	log "github.com/neelr/plate/pkg/logs"
-	"github.com/neelr/plate/pkg/setup"
->>>>>>> a850638d1d5a25cf0f5818826143b206e99a6ea0
 	"github.com/otiai10/copy"
 )
 

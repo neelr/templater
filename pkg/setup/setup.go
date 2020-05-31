@@ -5,11 +5,7 @@ import (
 	"os"
 	"os/user"
 
-<<<<<<< HEAD
 	log "github.com/neelr/templater/pkg/logs"
-=======
-	log "github.com/neelr/plate/pkg/logs"
->>>>>>> a850638d1d5a25cf0f5818826143b206e99a6ea0
 )
 
 // Configs sets up the config folder
