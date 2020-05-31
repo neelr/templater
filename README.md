@@ -6,7 +6,7 @@ A cli to create and share code templates and structure! This makes life super ea
 
 1. `go get -u github.com/neelr/templater/cmd/plate` Get the package from github
 
-2. `go install ithub.com/neelr/templater/cmd/plate` Install the package!
+2. `go install github.com/neelr/templater/cmd/plate` Install the package!
 
 ### Docs
 
