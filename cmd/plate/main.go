@@ -11,6 +11,7 @@ import (
 	"github.com/neelr/templater/pkg/load"
 	"github.com/neelr/templater/pkg/login"
 	log "github.com/neelr/templater/pkg/logs"
+	removeserver "github.com/neelr/templater/pkg/removesever"
 	"github.com/neelr/templater/pkg/upload"
 )
 
@@ -24,6 +25,7 @@ func main() {
 		login - Logs you in to our server's for uploads
 		upload {name} - Uploads the template to your cloud/account
 		get {user}/{name} - Gets the template of the user and downloads to your templates
+		deletefromserver {name} - Deletes the template that you uploaded before
 	`
 	if len(os.Args) < 2 {
 		log.NormalPrint(helpText)
@@ -40,6 +42,8 @@ func main() {
 			delete.Command(os.Args[2])
 		case "upload":
 			upload.Command(os.Args[2])
+		case "deletefromserver":
+			removeserver.Command(os.Args[2])
 		case "get":
 			get.Command(os.Args[2])
 		case "version":

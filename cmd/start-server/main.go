@@ -36,6 +36,9 @@ func main() {
 	// Get all users
 	http.HandleFunc("/api/users", allUsers)
 
+	// Delete online template
+	http.HandleFunc("/api/template/delete", deleteTemplate)
+
 	log.InformationPrint("On port 3000!")
 	http.ListenAndServe(":3001", nil)
 }
@@ -347,6 +350,81 @@ func userData(w http.ResponseWriter, r *http.Request) {
 	packet["templates"] = templates
 	packetJSON, _ := json.Marshal(packet)
 	w.Write(packetJSON)
+}
+
+func deleteTemplate(w http.ResponseWriter, r *http.Request) {
+	// Setup Firestore and Storage
+	httpClient := &http.Client{}
+	ctx := context.Background()
+	sa := option.WithCredentialsFile("./firebase_service.json")
+	app, err := firebase.NewApp(ctx, &firebase.Config{
+		ProjectID: "templater-9289d",
+	}, sa)
+	client, err := app.Firestore(ctx)
+	storageClient, err := app.Storage(ctx)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	defer client.Close()
+
+	// AUTHORIZE STATE
+	queries := r.URL.Query()
+	snap, err := client.Collection("key2oauth").Doc("map").Get(ctx)
+	if err != nil || snap.Data()[queries["key"][0]] == nil {
+		w.WriteHeader(401)
+		return
+	}
+	// Got oauth github, now request the login username
+	req, _ := http.NewRequest("GET", "https://api.github.com/user", nil)
+	req.Header.Add("Authorization", "token "+snap.Data()[queries["key"][0]].(string))
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		log.ErrorPrint(err.Error())
+		w.WriteHeader(400)
+		return
+	}
+
+	var githubResponse map[string]interface{}
+
+	json.Unmarshal(body, &githubResponse)
+
+	// Check if tenplate exists
+	snap, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(queries["template"][0]).Get(ctx)
+	if err == nil {
+		// If exists, delete the template and zip
+		bucket, err := storageClient.Bucket("templater-9289d.appspot.com")
+		if err != nil {
+			w.WriteHeader(400)
+			return
+		}
+		err = bucket.Object(snap.Data()["id"].(string) + ".zip").Delete(ctx)
+
+		client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(queries["template"][0]).Delete(ctx)
+	} else {
+		w.WriteHeader(404)
+	}
+
+	// May as well update the bio while your at it for a speedy website
+	_, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Set(ctx, map[string]string{
+		"avatar": githubResponse["avatar_url"].(string),
+		"bio":    githubResponse["bio"].(string),
+		"url":    githubResponse["html_url"].(string),
+	})
+
+	if err != nil {
+		log.ErrorPrint(err.Error())
+		w.WriteHeader(400)
+		return
+	}
 }
 
 func allUsers(w http.ResponseWriter, r *http.Request) {
