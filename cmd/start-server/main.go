@@ -33,8 +33,11 @@ func main() {
 	// Get user data
 	http.HandleFunc("/api/user/", userData)
 
+	// Get all users
+	http.HandleFunc("/api/users", allUsers)
+
 	log.InformationPrint("On port 3000!")
-	http.ListenAndServe(":3000", nil)
+	http.ListenAndServe(":3001", nil)
 }
 
 func handleOauth(w http.ResponseWriter, r *http.Request) {
@@ -344,4 +347,38 @@ func userData(w http.ResponseWriter, r *http.Request) {
 	packet["templates"] = templates
 	packetJSON, _ := json.Marshal(packet)
 	w.Write(packetJSON)
+}
+
+func allUsers(w http.ResponseWriter, r *http.Request) {
+	// Setup Firestore and Storage
+	ctx := context.Background()
+	sa := option.WithCredentialsFile("./firebase_service.json")
+	app, err := firebase.NewApp(ctx, &firebase.Config{
+		ProjectID: "templater-9289d",
+	}, sa)
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	defer client.Close()
+
+	// Get all users
+	usersDocs := client.Collection("Users").Documents(ctx)
+
+	// Iterate over collection of users to get each user name
+	var users []string
+	for {
+		doc, err := usersDocs.Next()
+		if err == iterator.Done {
+			break
+		}
+		paths := strings.SplitN(doc.Ref.Path, "/", 7)
+		users = append(users, paths[6])
+	}
+
+	// Send array of users
+	w.Header().Add("Content-Type", "application/json")
+	packet, _ := json.Marshal(users)
+	w.Write(packet)
 }
