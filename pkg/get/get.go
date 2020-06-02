@@ -21,32 +21,36 @@ func Command(slug string) {
 
 	log.Loading.Suffix = log.Information(" Getting template...")
 	log.Loading.Start()
-	downloadFile(tmpDir, "https://templater-api--hacker22.repl.co/api/templates/"+slug+"/download")
+	status := downloadFile(tmpDir, "https://templater-api--hacker22.repl.co/api/templates/"+slug+"/download")
+	if status == 404 {
+		log.Loading.Stop()
+		log.ErrorPrint("Cannot find template!")
+		return
+	}
 	unzip(tmpDir, os.Getenv("PLATE_DIR"))
 	os.Remove(tmpDir)
-	log.Loading.Stop()
 	log.InformationPrint("Loaded " + slug)
 }
 
-func downloadFile(filepath string, url string) error {
+func downloadFile(filepath string, url string) int {
 
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
-		return err
+		return resp.StatusCode
 	}
 	defer resp.Body.Close()
 
 	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
-		return err
+		return resp.StatusCode
 	}
 	defer out.Close()
 
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
-	return err
+	return resp.StatusCode
 }
 func unzip(src string, dest string) ([]string, error) {
 

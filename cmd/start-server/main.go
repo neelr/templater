@@ -397,7 +397,7 @@ func deleteTemplate(w http.ResponseWriter, r *http.Request) {
 
 	json.Unmarshal(body, &githubResponse)
 
-	// Check if tenplate exists
+	// Check if template exists
 	snap, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(queries["template"][0]).Get(ctx)
 	if err == nil {
 		// If exists, delete the template and zip
