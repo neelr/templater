@@ -445,14 +445,14 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	usersDocs := client.Collection("Users").Documents(ctx)
 
 	// Iterate over collection of users to get each user name
-	var users []string
+	users := make(map[string]interface{})
 	for {
 		doc, err := usersDocs.Next()
 		if err == iterator.Done {
 			break
 		}
 		paths := strings.SplitN(doc.Ref.Path, "/", 7)
-		users = append(users, paths[6])
+		users[paths[6]] = doc.Data()
 	}
 
 	// Send array of users
