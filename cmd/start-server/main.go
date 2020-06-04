@@ -44,6 +44,7 @@ func main() {
 }
 
 func handleOauth(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	// Setup Firebase creds
 	ctx := context.Background()
 	sa := option.WithCredentialsFile("./firebase_service.json")
@@ -107,6 +108,7 @@ func handleOauth(w http.ResponseWriter, r *http.Request) {
 }
 
 func upload(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	// Setup Firestore and Storage
 	httpClient := &http.Client{}
 	ctx := context.Background()
@@ -247,6 +249,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 }
 
 func getData(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	// Setup Firestore and Storage
 	ctx := context.Background()
 	sa := option.WithCredentialsFile("./firebase_service.json")
@@ -298,6 +301,7 @@ func getData(w http.ResponseWriter, r *http.Request) {
 }
 
 func userData(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	// Setup Firestore and Storage
 	ctx := context.Background()
 	sa := option.WithCredentialsFile("./firebase_service.json")
@@ -353,6 +357,7 @@ func userData(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteTemplate(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	// Setup Firestore and Storage
 	httpClient := &http.Client{}
 	ctx := context.Background()
@@ -428,6 +433,7 @@ func deleteTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func allUsers(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	// Setup Firestore and Storage
 	ctx := context.Background()
 	sa := option.WithCredentialsFile("./firebase_service.json")
@@ -459,4 +465,8 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	packet, _ := json.Marshal(users)
 	w.Write(packet)
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
