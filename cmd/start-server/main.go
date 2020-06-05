@@ -134,6 +134,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	name := ""
 	zipUUID := uuid.New().String()
 	readme := ""
+	var files []string
 
 	authed := false
 	for {
@@ -179,6 +180,15 @@ func upload(w http.ResponseWriter, r *http.Request) {
 			buf := new(bytes.Buffer)
 			buf.ReadFrom(part)
 			readme = buf.String()
+		} else if part.FormName() == "files" {
+			// Save files string
+			buf := new(bytes.Buffer)
+			buf.ReadFrom(part)
+			err = json.Unmarshal(buf.Bytes(), &files)
+			if err != nil {
+				w.WriteHeader(400)
+				return
+			}
 		} else if part.FormName() == "state" {
 			// AUTHORIZE STATE
 			buf := new(bytes.Buffer)
@@ -225,9 +235,10 @@ func upload(w http.ResponseWriter, r *http.Request) {
 			}
 
 			// Got and parsed login username, now store new template document in firebase as well as reference to storage file
-			_, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(name).Set(ctx, map[string]string{
+			_, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(name).Set(ctx, map[string]interface{}{
 				"id":     zipUUID,
 				"README": readme,
+				"files":  files,
 			})
 
 			// May as well update the bio while your at it for a speedy website

@@ -3,6 +3,7 @@ package upload
 import (
 	"archive/zip"
 	"bytes"
+	"encoding/json"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -38,9 +39,23 @@ func Command(name string) {
 	if err != nil {
 		readme = []byte("")
 	}
+	var allFiles []string
+	err = filepath.Walk(path.Join(os.Getenv("PLATE_DIR"), name),
+		func(file string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() {
+				allFiles = append(allFiles, strings.Replace(file, path.Join(os.Getenv("PLATE_DIR"), name), "", 1))
+				return nil
+			}
+			return nil
+		})
+	marshalledFiles, _ := json.Marshal(allFiles)
 	req, err := newfileUploadRequest("https://templater-api--hacker22.repl.co/api/upload", map[string]string{
 		"name":   name,
 		"README": string(readme),
+		"files":  string(marshalledFiles),
 		"state":  string(key),
 	}, "zip", path.Join(os.Getenv("PLATE_DIR"), "tmp.zip"))
 	r, err := client.Do(req)
