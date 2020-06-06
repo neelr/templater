@@ -39,8 +39,11 @@ func main() {
 	// Delete online template
 	http.HandleFunc("/api/template/delete", deleteTemplate)
 
+	// Query all the templates from the Index
+	http.HandleFunc("/api/query", queryHandle)
+
 	log.InformationPrint("On port 3000!")
-	http.ListenAndServe(":3001", nil)
+	http.ListenAndServe(":3000", nil)
 }
 
 func handleOauth(w http.ResponseWriter, r *http.Request) {
@@ -241,6 +244,11 @@ func upload(w http.ResponseWriter, r *http.Request) {
 				"files":  files,
 			})
 
+			_, err = client.Collection("Index").Doc(githubResponse["login"].(string)+"---"+name).Set(ctx, map[string]string{
+				"user":     githubResponse["login"].(string),
+				"template": name,
+			})
+
 			// May as well update the bio while your at it for a speedy website
 			_, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Set(ctx, map[string]string{
 				"avatar": githubResponse["avatar_url"].(string),
@@ -424,6 +432,7 @@ func deleteTemplate(w http.ResponseWriter, r *http.Request) {
 		}
 		err = bucket.Object(snap.Data()["id"].(string) + ".zip").Delete(ctx)
 
+		client.Collection("Index").Doc(githubResponse["login"].(string) + "---" + queries["template"][0]).Delete(ctx)
 		client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(queries["template"][0]).Delete(ctx)
 	} else {
 		w.WriteHeader(404)
@@ -480,4 +489,43 @@ func allUsers(w http.ResponseWriter, r *http.Request) {
 
 func enableCors(w *http.ResponseWriter) {
 	(*w).Header().Set("Access-Control-Allow-Origin", "*")
+}
+
+func queryHandle(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+	// Setup Firestore and Storage
+	ctx := context.Background()
+	sa := option.WithCredentialsFile("./firebase_service.json")
+	app, err := firebase.NewApp(ctx, &firebase.Config{
+		ProjectID: "templater-9289d",
+	}, sa)
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	defer client.Close()
+
+	body, _ := ioutil.ReadAll(r.Body)
+
+	templateIndex := client.Collection("Index").Documents(ctx)
+
+	var templates []interface{}
+	for {
+		doc, err := templateIndex.Next()
+		if err == iterator.Done {
+			break
+		}
+		if strings.Contains(doc.Data()["template"].(string), string(body)) {
+			templates = append(templates, doc.Data())
+		}
+	}
+	packet, err := json.Marshal(templates)
+
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(packet)
 }
