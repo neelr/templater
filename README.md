@@ -35,13 +35,17 @@ Logs you in so you can upload your templates so others can download them!
 
 After you've logged in, you can upload a plate so people can see it! It'll give you a slug in the format `githubUsername/templateName` which others can use to download your template!
 
+##### `plate deletefromserver name`
+
+Delete the template you uploaded in the past!
+
 ##### `plate get githubUsername/templateName`
 
 Install the template someone uploaded! You can load it anytime you want!
 
 
 ## TODO:
-1. Create a Nextjs UI so people can view people's templates
-2. Create a landing page along with a logo
+- [x] Create a Nextjs UI so people can view people's templates
+- [ ] Create a landing page along with a logo
 
 Open to contributers! Just open up an issue/PR!
