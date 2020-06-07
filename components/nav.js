@@ -28,6 +28,7 @@ export default () => {
                 ml: "20px",
                 my: "auto",
                 width: "200px",
+                color: "text",
                 "::placeholder": {
                     color: "text",
                     opactity: "0.6"
