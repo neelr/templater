@@ -1,0 +1,23 @@
+{
+	"name": "templater",
+	"version": "1.0.0",
+	"description": "Website for templater",
+	"scripts": {
+		"build": "next build",
+		"export": "npm run build && next export",
+		"test": "next"
+	},
+	"author": "neelr",
+	"license": "MIT",
+	"dependencies": {
+		"dompurify": "^2.0.11",
+		"isomorphic-unfetch": "^3.0.0",
+		"marked": "^1.1.0",
+		"next": "^9.4.4",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1",
+		"react-feather": "^2.0.8",
+		"rebass": "^4.0.7",
+		"theme-ui": "^0.3.1"
+	}
+}
