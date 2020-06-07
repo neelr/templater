@@ -21,7 +21,7 @@ func Command(name string) {
 	}
 	log.Loading.Suffix = log.Error(" Deleting the template from our servers...")
 	log.Loading.Start()
-	resp, err := http.Get("https://templater-api--hacker22.repl.co/api/template/delete?key=" + string(key) + "&template=" + name)
+	resp, err := http.Get(os.Getenv("URL") + "/api/template/delete?key=" + string(key) + "&template=" + name)
 	log.Loading.Stop()
 	if err != nil {
 		log.ErrorPrint(err.Error())

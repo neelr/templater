@@ -15,12 +15,15 @@ import (
 	firebase "firebase.google.com/go"
 	"github.com/google/uuid"
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/neelr/templater/config/settings"
 	log "github.com/neelr/templater/pkg/logs"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
 func main() {
+	settings.InitSettings()
+
 	// Github OAUTH
 	http.HandleFunc("/api/oauth", handleOauth)
 
@@ -217,7 +220,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 		// If exists, delete the zip file in storage so we can replace later on
 
 		// Setup Bucket
-		bucket, err := storageClient.Bucket("templater-9289d.appspot.com")
+		bucket, err := storageClient.Bucket(os.Getenv("FIREBASE"))
 		if err != nil {
 			w.WriteHeader(400)
 			return
@@ -264,7 +267,7 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(githubResponse["login"].(string) + "/" + name))
 
 	// Setup Bucket
-	bucket, err := storageClient.Bucket("templater-9289d.appspot.com")
+	bucket, err := storageClient.Bucket(os.Getenv("FIREBASE"))
 	if err != nil {
 		w.WriteHeader(400)
 		return
@@ -324,7 +327,7 @@ func getData(w http.ResponseWriter, r *http.Request) {
 	if len(pathArray) == 6 && pathArray[5] == "download" {
 
 		// Get storage bucket and copy from there to response
-		bucket, _ := storageClient.Bucket("templater-9289d.appspot.com")
+		bucket, _ := storageClient.Bucket(os.Getenv("FIREBASE"))
 		rc, _ := bucket.Object(templateDesc.Data()["id"].(string) + ".zip").NewReader(ctx)
 		w.Header().Set("Content-Disposition", "attachment; filename="+templateName+".zip")
 		w.Header().Add("Content-Type", "application/zip")
@@ -443,7 +446,7 @@ func deleteTemplate(w http.ResponseWriter, r *http.Request) {
 	snap, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(queries["template"][0]).Get(ctx)
 	if err == nil {
 		// If exists, delete the template and zip
-		bucket, err := storageClient.Bucket("templater-9289d.appspot.com")
+		bucket, err := storageClient.Bucket(os.Getenv("FIREBASE"))
 		if err != nil {
 			w.WriteHeader(400)
 			return

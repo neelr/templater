@@ -4,6 +4,7 @@ import (
 	"os"
 
 	_ "github.com/joho/godotenv/autoload"
+	"github.com/neelr/templater/config/settings"
 	"github.com/neelr/templater/pkg/create"
 	"github.com/neelr/templater/pkg/delete"
 	"github.com/neelr/templater/pkg/get"
@@ -16,6 +17,8 @@ import (
 )
 
 func main() {
+	settings.InitSettings()
+
 	helpText := `
 		HELP:
 		create {name} - Creates a template from the current directory and stores it in the name

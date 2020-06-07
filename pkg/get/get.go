@@ -21,7 +21,7 @@ func Command(slug string) {
 
 	log.Loading.Suffix = log.Information(" Getting template...")
 	log.Loading.Start()
-	status := downloadFile(tmpDir, "https://templater-api--hacker22.repl.co/api/templates/"+slug+"/download")
+	status := downloadFile(tmpDir, os.Getenv("URL")+"/api/templates/"+slug+"/download")
 	if status == 404 {
 		log.Loading.Stop()
 		log.ErrorPrint("Cannot find template!")

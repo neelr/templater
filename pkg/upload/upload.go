@@ -52,7 +52,7 @@ func Command(name string) {
 			return nil
 		})
 	marshalledFiles, _ := json.Marshal(allFiles)
-	req, err := newfileUploadRequest("https://templater-api--hacker22.repl.co/api/upload", map[string]string{
+	req, err := newfileUploadRequest(os.Getenv("URL")+"/api/upload", map[string]string{
 		"name":   name,
 		"README": string(readme),
 		"files":  string(marshalledFiles),
