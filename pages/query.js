@@ -7,7 +7,7 @@ import Head from "next/head"
 
 const UserPage = props => {
     const router = useRouter()
-    let [search, setSearch] = useState()
+    let [search, setSearch] = useState("pending")
     useEffect(() => {
         fetch(`https://templater-api.hacker22.repl.co/api/query`, {
             method: "POST",
@@ -17,7 +17,7 @@ const UserPage = props => {
             .then(d => setSearch(d))
             .catch(d => console.log(404))
     }, router.query.q)
-    if (search) {
+    if (search != "pending") {
         return (
             <Flex w="100vw" flexDirection="column">
                 <Head>
@@ -26,7 +26,7 @@ const UserPage = props => {
                 <Heading mx="auto">Search Results for "{router.query.q}"</Heading>
                 <Flex mx="auto" width={["90vw", "70vw", "60vw"]} flexWrap="wrap">
                     {
-                        search.map(v => (
+                        search ? search.map(v => (
                             <Link href={`/${v.user}/${v.template}`}>
                                 <Text m="10px" p="10px" sx={{
                                     boxShadow: "lg", borderRadius: "10px", ":hover": {
@@ -35,7 +35,7 @@ const UserPage = props => {
                                     }
                                 }}>@{v.user}/{v.template}</Text>
                             </Link>
-                        ))
+                        )) : <Text mx="auto">No Results</Text>
                     }
                 </Flex>
             </Flex>
