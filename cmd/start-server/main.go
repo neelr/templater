@@ -137,42 +137,18 @@ func upload(w http.ResponseWriter, r *http.Request) {
 	name := ""
 	zipUUID := uuid.New().String()
 	readme := ""
+	state := ""
+	zipBuf := new(bytes.Buffer)
 	var files []string
 
-	authed := false
+	// Log multipart to variables
 	for {
 		part, err := readForm.NextPart()
 		if err == io.EOF {
 			break
 		}
 		if part.FormName() == "zip" {
-
-			// upload zipped template if the authentication state came before
-			if !authed {
-				w.WriteHeader(401)
-				return
-			}
-
-			// Setup Bucket
-			bucket, err := storageClient.Bucket("templater-9289d.appspot.com")
-			if err != nil {
-				w.WriteHeader(400)
-				return
-			}
-			wc := bucket.Object(zipUUID + ".zip").NewWriter(ctx)
-			wc.ContentType = "application/zip"
-			buf := new(bytes.Buffer)
-			buf.ReadFrom(part)
-
-			// Write zip to bucket
-			if _, err := wc.Write(buf.Bytes()); err != nil {
-				log.ErrorPrint(err.Error())
-				return
-			}
-			if err := wc.Close(); err != nil {
-				log.ErrorPrint(err.Error())
-				return
-			}
+			zipBuf.ReadFrom(part)
 		} else if part.FormName() == "name" {
 			// Save Name
 			buf := new(bytes.Buffer)
@@ -193,77 +169,119 @@ func upload(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		} else if part.FormName() == "state" {
-			// AUTHORIZE STATE
 			buf := new(bytes.Buffer)
 			buf.ReadFrom(part)
-			snap, err := client.Collection("key2oauth").Doc("map").Get(ctx)
-			if err != nil || snap.Data()[buf.String()] == nil {
-				w.WriteHeader(401)
-				return
-			}
-			// Got oauth github, now request the login username
-			req, _ := http.NewRequest("GET", "https://api.github.com/user", nil)
-			req.Header.Add("Authorization", "token "+snap.Data()[buf.String()].(string))
-			resp, err := httpClient.Do(req)
-			if err != nil {
-				w.WriteHeader(400)
-				return
-			}
-			defer resp.Body.Close()
-
-			body, err := ioutil.ReadAll(resp.Body)
-
-			if err != nil {
-				log.ErrorPrint(err.Error())
-				w.WriteHeader(400)
-				return
-			}
-
-			var githubResponse map[string]interface{}
-
-			json.Unmarshal(body, &githubResponse)
-
-			// Check if tenplate exists
-			snap, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(name).Get(ctx)
-			if err == nil {
-				// If exists, delete the zip file in storage so we can replace later on
-
-				// Setup Bucket
-				bucket, err := storageClient.Bucket("templater-9289d.appspot.com")
-				if err != nil {
-					w.WriteHeader(400)
-					return
-				}
-				err = bucket.Object(snap.Data()["id"].(string) + ".zip").Delete(ctx)
-			}
-
-			// Got and parsed login username, now store new template document in firebase as well as reference to storage file
-			_, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(name).Set(ctx, map[string]interface{}{
-				"id":     zipUUID,
-				"README": readme,
-				"files":  files,
-			})
-
-			_, err = client.Collection("Index").Doc(githubResponse["login"].(string)+"---"+name).Set(ctx, map[string]string{
-				"user":     githubResponse["login"].(string),
-				"template": name,
-			})
-
-			// May as well update the bio while your at it for a speedy website
-			_, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Set(ctx, map[string]string{
-				"avatar": githubResponse["avatar_url"].(string),
-				"bio":    githubResponse["bio"].(string),
-				"url":    githubResponse["html_url"].(string),
-			})
-
-			if err != nil {
-				log.ErrorPrint(err.Error())
-				w.WriteHeader(400)
-				return
-			}
-			w.Write([]byte(githubResponse["login"].(string) + "/" + name))
-			authed = true
+			state = buf.String()
 		}
+	}
+
+	// Add a check that all variables were filled in the multipart form
+	if name == "" || state == "" || zipBuf.Len() == 0 {
+		w.WriteHeader(400)
+		return
+	}
+
+	// After recorded all variables
+
+	// AUTHORIZE STATE
+	snap, err := client.Collection("key2oauth").Doc("map").Get(ctx)
+	if err != nil || snap.Data()[state] == nil {
+		w.WriteHeader(401)
+		return
+	}
+	// Got oauth github, now request the login username
+	req, _ := http.NewRequest("GET", "https://api.github.com/user", nil)
+	req.Header.Add("Authorization", "token "+snap.Data()[state].(string))
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+
+	if err != nil {
+		log.ErrorPrint(err.Error())
+		w.WriteHeader(400)
+		return
+	}
+
+	var githubResponse map[string]interface{}
+
+	json.Unmarshal(body, &githubResponse)
+
+	// Check if template exists
+	snap, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(name).Get(ctx)
+	if err == nil {
+		// If exists, delete the zip file in storage so we can replace later on
+
+		// Setup Bucket
+		bucket, err := storageClient.Bucket("templater-9289d.appspot.com")
+		if err != nil {
+			w.WriteHeader(400)
+			return
+		}
+		err = bucket.Object(snap.Data()["id"].(string) + ".zip").Delete(ctx)
+	}
+
+	// Got and parsed login username, now store new template document in firebase as well as reference to storage file
+	_, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Collection("templates").Doc(name).Set(ctx, map[string]interface{}{
+		"id":     zipUUID,
+		"README": readme,
+		"files":  files,
+	})
+
+	if err != nil {
+		log.ErrorPrint(err.Error())
+		w.WriteHeader(400)
+		return
+	}
+
+	_, err = client.Collection("Index").Doc(githubResponse["login"].(string)+"---"+name).Set(ctx, map[string]string{
+		"user":     githubResponse["login"].(string),
+		"template": name,
+	})
+
+	if err != nil {
+		log.ErrorPrint(err.Error())
+		w.WriteHeader(400)
+		return
+	}
+
+	// May as well update the bio while your at it for a speedy website
+	_, err = client.Collection("Users").Doc(githubResponse["login"].(string)).Set(ctx, map[string]string{
+		"avatar": githubResponse["avatar_url"].(string),
+		"bio":    githubResponse["bio"].(string),
+		"url":    githubResponse["html_url"].(string),
+	})
+
+	if err != nil {
+		log.ErrorPrint(err.Error())
+		w.WriteHeader(400)
+		return
+	}
+	w.Write([]byte(githubResponse["login"].(string) + "/" + name))
+
+	// Setup Bucket
+	bucket, err := storageClient.Bucket("templater-9289d.appspot.com")
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	wc := bucket.Object(zipUUID + ".zip").NewWriter(ctx)
+	wc.ContentType = "application/zip"
+
+	// Write zip to bucket
+	if _, err := wc.Write(zipBuf.Bytes()); err != nil {
+		log.ErrorPrint(err.Error())
+		w.WriteHeader(400)
+		return
+	}
+	if err := wc.Close(); err != nil {
+		log.ErrorPrint(err.Error())
+		w.WriteHeader(400)
+		return
 	}
 }
 

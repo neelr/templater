@@ -60,16 +60,18 @@ func Command(name string) {
 	}, "zip", path.Join(os.Getenv("PLATE_DIR"), "tmp.zip"))
 	r, err := client.Do(req)
 	if err != nil {
-		log.ErrorPrint(err.Error())
+		log.Loading.Stop()
+		log.ErrorPrint("Couldn't connect to servers... Try Again Later!")
+		return
 	}
 	body, _ := ioutil.ReadAll(r.Body)
 	log.Loading.Stop()
 	os.Remove(path.Join(os.Getenv("PLATE_DIR"), "tmp.zip"))
 	if r.StatusCode == 200 {
 		log.InformationPrint("Uploaded file to " + string(body))
-		return
+
 	}
-	log.ErrorPrint("Unauthorized! Log in again!")
+	log.ErrorPrint("Error " + r.Status + "! Make sure you are logged in! If this doesn't make sense, make an issue on https://github.com/neelr/templater!")
 }
 
 // Creates a new file upload http request with optional extra params
