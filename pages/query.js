@@ -20,6 +20,9 @@ const UserPage = props => {
     if (search) {
         return (
             <Flex w="100vw" flexDirection="column">
+                <Head>
+                    <title>Search Results for "{router.query.q}"</title>
+                </Head>
                 <Heading mx="auto">Search Results for "{router.query.q}"</Heading>
                 <Flex mx="auto" width={["90vw", "70vw", "60vw"]} flexWrap="wrap">
                     {
