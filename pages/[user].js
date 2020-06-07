@@ -32,16 +32,17 @@ const UserPage = props => {
                 <Heading my="10px" fontSize={3} mx="auto">Templates</Heading>
                 <Flex mx="auto" width={["90vw", "70vw", "60vw"]} flexWrap="wrap">
                     {
-                        userData.templates.map(v => (
-                            <Link href={`/${router.query.user}/${v}`}>
-                                <Text m="10px" p="10px" sx={{
-                                    boxShadow: "lg", borderRadius: "10px", ":hover": {
-                                        color: "primary",
-                                        cursor: "pointer"
-                                    }
-                                }}>@{router.query.user}/{v}</Text>
-                            </Link>
-                        ))
+                        userData.templates ?
+                            userData.templates.map(v => (
+                                <Link href={`/${router.query.user}/${v}`}>
+                                    <Text m="10px" p="10px" sx={{
+                                        boxShadow: "lg", borderRadius: "10px", ":hover": {
+                                            color: "primary",
+                                            cursor: "pointer"
+                                        }
+                                    }}>@{router.query.user}/{v}</Text>
+                                </Link>
+                            )) : <Text mx="auto">No Templates!</Text>
                     }
                 </Flex>
             </Flex>
