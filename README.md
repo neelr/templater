@@ -45,7 +45,7 @@ Install the template someone uploaded! You can load it anytime you want!
 
 
 ## TODO:
-1. Create a Nextjs UI so people can view people's templates
-2. Create a landing page along with a logo
+- [x] Create a Nextjs UI so people can view people's templates
+- [ ] Create a landing page along with a logo
 
 Open to contributers! Just open up an issue/PR!
