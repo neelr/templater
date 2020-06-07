@@ -69,7 +69,7 @@ func Command(name string) {
 	os.Remove(path.Join(os.Getenv("PLATE_DIR"), "tmp.zip"))
 	if r.StatusCode == 200 {
 		log.InformationPrint("Uploaded file to " + string(body))
-
+		return
 	}
 	log.ErrorPrint("Error " + r.Status + "! Make sure you are logged in! If this doesn't make sense, make an issue on https://github.com/neelr/templater!")
 }
