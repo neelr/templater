@@ -24,7 +24,7 @@ export default class extends React.Component {
                 </Head>
                 <Heading mx="auto" fontSize={[4, 5, 6]}>Templater</Heading>
                 <Text sx={{ textIndent: "15px" }} width={["90vw", "50vw", "40vw"]} py="10px" mx="auto">The templating platform for all your needs! It has an easy to use CLI that links to this website, so you can showcase cool templates that you made easily and without any pain! Almost no setup and removes the need to clone a repo, or for 100's of boilerplate commands.</Text>
-                <Button px="20px" fontSize={[2, 3, 3]} mx="auto" sx={{
+                <Button as="a" href="https://github.com/neelr/templater" px="20px" fontSize={[2, 3, 3]} mx="auto" sx={{
                     ":hover": {
                         bg: "secondary",
                         cursor: "pointer"
