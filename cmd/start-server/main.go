@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"cloud.google.com/go/firestore"
@@ -23,6 +24,12 @@ import (
 
 func main() {
 	settings.InitSettings()
+
+	// Server Response
+	http.HandleFunc("/api/badges", handleOk)
+
+	// Template Number
+	http.HandleFunc("/api/badges/templates", handleTemplatesBadge)
 
 	// Github OAUTH
 	http.HandleFunc("/api/oauth", handleOauth)
@@ -548,5 +555,44 @@ func queryHandle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Add("Content-Type", "application/json")
+	w.Write(packet)
+}
+
+func handleOk(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Content-Type", "application/json")
+	packet, _ := json.Marshal(map[string]interface{}{
+		"schemaVersion": 1,
+		"label":         "Server Status",
+		"message":       "Up",
+		"color":         "green",
+	})
+	w.Write(packet)
+}
+
+func handleTemplatesBadge(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
+	// Setup Firestore and Storage
+	ctx := context.Background()
+	sa := option.WithCredentialsFile("./firebase_service.json")
+	app, err := firebase.NewApp(ctx, &firebase.Config{
+		ProjectID: "templater-9289d",
+	}, sa)
+	client, err := app.Firestore(ctx)
+	if err != nil {
+		w.WriteHeader(400)
+		return
+	}
+	defer client.Close()
+
+	templateIndex := client.Collection("Index").Documents(ctx)
+	allDocuments, _ := templateIndex.GetAll()
+
+	w.Header().Add("Content-Type", "application/json")
+	packet, _ := json.Marshal(map[string]interface{}{
+		"schemaVersion": 1,
+		"label":         "Templates",
+		"message":       strconv.Itoa(len(allDocuments)),
+		"color":         "green",
+	})
 	w.Write(packet)
 }
