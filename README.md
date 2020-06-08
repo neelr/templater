@@ -13,8 +13,6 @@
         <img src="https://badgen.net/github/closed-issues/neelr/templater" /></a>
      <a href="https://github.com/neelr/templater/issues" alt="Open Issues">
         <img src="https://badgen.net/github/open-issues/neelr/templater" /></a>
-    <a href="https://github.com/neelr/templater/actions" alt="Actions">
-        <img src="https://badgen.net/github/checks/neelr/templater" /></a>
       <a href="https://github.com/neelr/templater/actions" alt="Actions">
         <img src="https://badgen.net/github/checks/neelr/templater" /></a>
   <a href="https://github.com/neelr/templater/releases" alt="Release">
