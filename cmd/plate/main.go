@@ -12,7 +12,7 @@ import (
 	"github.com/neelr/templater/pkg/load"
 	"github.com/neelr/templater/pkg/login"
 	log "github.com/neelr/templater/pkg/logs"
-	removeserver "github.com/neelr/templater/pkg/removesever"
+	"github.com/neelr/templater/pkg/removeserver"
 	"github.com/neelr/templater/pkg/upload"
 )
 

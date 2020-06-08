@@ -1,9 +1,9 @@
-package get
+package setup
 
 import "testing"
 
 func TestCommand(t *testing.T) {
-	err := Command("test")
+	err := Configs()
 	if err != nil {
 		t.Error(err)
 	}

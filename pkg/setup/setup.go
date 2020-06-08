@@ -9,14 +9,14 @@ import (
 )
 
 // Configs sets up the config folder
-func Configs() {
+func Configs() error {
 	dir := os.Getenv("PLATE_DIR")
 	if os.Getenv("PLATE_DIR") == "" {
 		usr, err := user.Current()
 
 		if err != nil {
 			fmt.Println("Home Directory Not Found")
-			return
+			return err
 		}
 
 		dir = usr.HomeDir + "/.plate"
@@ -26,5 +26,5 @@ func Configs() {
 		log.ErrorPrint("Config folder not found... Creating at " + dir)
 		os.Mkdir(dir, os.ModePerm)
 	}
-
+	return nil
 }
