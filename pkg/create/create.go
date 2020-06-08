@@ -10,15 +10,21 @@ import (
 )
 
 // RunCommand runs a command
-func Command(name string) {
+func Command(name string) error {
 	setup.Configs()
 
 	configFolder := path.Join(os.Getenv("PLATE_DIR"), name)
-	currentFolder, _ := os.Getwd()
+	currentFolder, err := os.Getwd()
+
+	if err != nil {
+		return err
+	}
 
 	log.Loading.Suffix = log.Information("Transferring Files....")
 	log.Loading.Start()
 	copy.Copy(currentFolder, configFolder)
 	log.Loading.Stop()
 	log.InformationPrint("Saved current directory as \"" + name + "\"!")
+
+	return nil
 }

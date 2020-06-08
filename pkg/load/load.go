@@ -9,11 +9,15 @@ import (
 	"github.com/otiai10/copy"
 )
 
-func Command(name string) {
+func Command(name string) error {
 	setup.Configs()
 
 	configFolder := path.Join(os.Getenv("PLATE_DIR"), name)
-	currentFolder, _ := os.Getwd()
+	currentFolder, err := os.Getwd()
+
+	if err != nil {
+		return err
+	}
 
 	log.Loading.Suffix = log.Information("Transferring Files....")
 	log.Loading.Start()
@@ -21,4 +25,5 @@ func Command(name string) {
 	log.Loading.Stop()
 
 	log.InformationPrint("Transferred template to current directory!")
+	return nil
 }

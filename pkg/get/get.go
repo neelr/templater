@@ -2,6 +2,7 @@ package get
 
 import (
 	"archive/zip"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,7 +15,7 @@ import (
 	"github.com/neelr/templater/pkg/setup"
 )
 
-func Command(slug string) {
+func Command(slug string) error {
 	setup.Configs()
 
 	tmpDir := path.Join(os.Getenv("PLATE_DIR"), "tmp.zip")
@@ -22,14 +23,15 @@ func Command(slug string) {
 	log.Loading.Suffix = log.Information(" Getting template...")
 	log.Loading.Start()
 	status := downloadFile(tmpDir, os.Getenv("URL")+"/api/templates/"+slug+"/download")
-	if status == 404 {
+	if status == 404 || status == 0 {
 		log.Loading.Stop()
 		log.ErrorPrint("Cannot find template!")
-		return
+		return errors.New("no such template")
 	}
 	unzip(tmpDir, os.Getenv("PLATE_DIR"))
 	os.Remove(tmpDir)
 	log.InformationPrint("Loaded " + slug)
+	return nil
 }
 
 func downloadFile(filepath string, url string) int {
@@ -37,7 +39,7 @@ func downloadFile(filepath string, url string) int {
 	// Get the data
 	resp, err := http.Get(url)
 	if err != nil {
-		return resp.StatusCode
+		return 0
 	}
 	defer resp.Body.Close()
 

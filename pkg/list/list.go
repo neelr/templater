@@ -9,11 +9,13 @@ import (
 	"github.com/neelr/templater/pkg/setup"
 )
 
-func Command() {
+func Command() error {
 	setup.Configs()
 
-	templates, _ := ioutil.ReadDir(os.Getenv("PLATE_DIR"))
-
+	templates, err := ioutil.ReadDir(os.Getenv("PLATE_DIR"))
+	if err != nil {
+		return err
+	}
 	log.InformationPrint("All Templates")
 	log.InformationPrint("------------------")
 	for _, f := range templates {
@@ -21,4 +23,5 @@ func Command() {
 			log.NormalPrint(f.Name() + " - " + strconv.FormatInt(f.Size(), 10) + " bytes")
 		}
 	}
+	return nil
 }

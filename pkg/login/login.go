@@ -14,22 +14,20 @@ import (
 	"github.com/neelr/templater/pkg/setup"
 )
 
-var CLIENT_ID = "33449dcb2152190815b2"
-
-func Command() {
+func Command() error {
 	setup.Configs()
 	key, _ := randomHex(128)
 	log.InformationPrint("Redirecting you to GitHub Oauth...")
 	// Check if theres a key already in .config
 	startKey, err := ioutil.ReadFile(path.Join(os.Getenv("PLATE_DIR"), ".config"))
 	if err != nil {
-		openbrowser("https://github.com/login/oauth/authorize?client_id=" + CLIENT_ID + "&state=" + key)
+		openbrowser("https://github.com/login/oauth/authorize?client_id=" + os.Getenv("GH_OAUTH_CLIENT") + "&state=" + key)
 	} else {
 		// If a key, send it over to delete
-		openbrowser("https://github.com/login/oauth/authorize?client_id=" + CLIENT_ID + "&state=" + key + "|" + string(startKey))
+		openbrowser("https://github.com/login/oauth/authorize?client_id=" + os.Getenv("GH_OAUTH_CLIENT") + "&state=" + key + "|" + string(startKey))
 	}
 
-	ioutil.WriteFile(path.Join(os.Getenv("PLATE_DIR"), ".config"), []byte(key), 0644)
+	return ioutil.WriteFile(path.Join(os.Getenv("PLATE_DIR"), ".config"), []byte(key), 0644)
 }
 
 func openbrowser(url string) {
