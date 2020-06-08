@@ -49,8 +49,6 @@ func main() {
 			removeserver.Command(os.Args[2])
 		case "get":
 			get.Command(os.Args[2])
-		case "version":
-			log.NormalPrint("plate v1.0")
 		default:
 			log.NormalPrint(helpText)
 		}
@@ -58,6 +56,8 @@ func main() {
 		list.Command()
 	} else if os.Args[1] == "login" {
 		login.Command()
+	} else if os.Args[1] == "version" {
+		log.NormalPrint("plate v1.0")
 	} else {
 		log.NormalPrint(helpText)
 	}

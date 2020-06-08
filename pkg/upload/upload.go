@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -18,7 +19,7 @@ import (
 	"github.com/neelr/templater/pkg/setup"
 )
 
-func Command(name string) {
+func Command(name string) error {
 	client := &http.Client{}
 	setup.Configs()
 	configFile := path.Join(os.Getenv("PLATE_DIR"), ".config")
@@ -27,7 +28,7 @@ func Command(name string) {
 	}
 	if _, err := os.Stat(path.Join(os.Getenv("PLATE_DIR"), name)); err != nil {
 		log.ErrorPrint("Template does not exist!")
-		return
+		return errors.New("couldn't find template given")
 	}
 
 	log.Loading.Suffix = log.Information(" Uploading the template....")
@@ -62,16 +63,17 @@ func Command(name string) {
 	if err != nil {
 		log.Loading.Stop()
 		log.ErrorPrint("Couldn't connect to servers... Try Again Later!")
-		return
+		return err
 	}
 	body, _ := ioutil.ReadAll(r.Body)
 	log.Loading.Stop()
 	os.Remove(path.Join(os.Getenv("PLATE_DIR"), "tmp.zip"))
 	if r.StatusCode == 200 {
 		log.InformationPrint("Uploaded file to " + string(body))
-		return
+		return nil
 	}
 	log.ErrorPrint("Error " + r.Status + "! Make sure you are logged in! If this doesn't make sense, make an issue on https://github.com/neelr/templater!")
+	return errors.New(r.Status)
 }
 
 // Creates a new file upload http request with optional extra params
