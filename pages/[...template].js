@@ -35,9 +35,11 @@ const Templates = props => {
                             }
                         }}>@{router.query.template[0]}</span></Link>/{`${router.query.template[1]}`}</Heading>
                 <Text my="10px" mx="auto"><a sx={{
+                    color: "primary",
                     ":hover": {
                         color: "secondary",
-                        cursor: "pointer"
+                        cursor: "pointer",
+                        textDecorationStyle: "wavy"
                     }
                 }} href={`https://templater-api.hacker22.repl.co/api/templates/${router.query.template[0]}/${router.query.template[1]}/download`}>Download this template</a> or use the command <code>plate get {`${router.query.template[0]}/${router.query.template[1]}`}</code></Text>
                 <Heading fontSize={3} mx="auto" my="10px">Files</Heading>
@@ -52,7 +54,14 @@ const Templates = props => {
                     dangerouslySetInnerHTML={{ __html: templateData.files ? templateData.files.join("<br/>") : "" }} />
                 <Flex sx={{
                     width: ["90vw", "75vw", "60vw"],
-                    mx: "auto"
+                    mx: "auto",
+                    "a": {
+                        color: "primary",
+                        ":hover": {
+                            color: "secondary",
+                            textDecorationStyle: "wavy"
+                        }
+                    }
                 }} flexDirection="column" dangerouslySetInnerHTML={{ __html: dompurify.sanitize(marked(templateData.README)) }} />
             </Flex>
         )
