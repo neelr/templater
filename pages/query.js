@@ -8,6 +8,7 @@ import Head from "next/head"
 const UserPage = props => {
     const router = useRouter()
     let [search, setSearch] = useState("pending")
+    const [notFound, setFound] = useState("");
     useEffect(() => {
         fetch(`https://templater-api.hacker22.repl.co/api/query`, {
             method: "POST",
@@ -15,7 +16,7 @@ const UserPage = props => {
         })
             .then(d => d.json())
             .then(d => setSearch(d))
-            .catch(d => console.log(404))
+            .catch(d => setFound("404 Not Found"))
     }, router.query.q)
     if (search != "pending") {
         return (
@@ -42,7 +43,7 @@ const UserPage = props => {
         )
     } else {
         return (
-            <Text>404 not found</Text>
+            <Heading mx="auto" my="20px" color="primary">{notFound}</Heading>
         )
     }
 }

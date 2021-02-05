@@ -8,11 +8,12 @@ import Head from "next/head"
 const UserPage = props => {
     const router = useRouter()
     const [userData, setData] = useState();
+    const [notFound, setFound] = useState("");
     useEffect(() => {
         fetch(`https://templater-api.hacker22.repl.co/api/user/${router.query.user}`)
             .then(d => d.json())
             .then(d => setData(d))
-            .catch(d => console.log(404))
+            .catch(d => setFound("404 Not Found"))
     }, router.query.user)
     if (userData) {
         return (
@@ -49,7 +50,7 @@ const UserPage = props => {
         )
     } else {
         return (
-            <Text>404 not found</Text>
+            <Heading mx="auto" my="20px" color="primary">{notFound}</Heading>
         )
     }
 }

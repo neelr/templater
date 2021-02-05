@@ -12,12 +12,13 @@ import Link from "next/link"
 const Templates = props => {
     const router = useRouter()
     const [templateData, setData] = useState();
+    const [notFound, setFound] = useState("");
     useEffect(() => {
         if (router.query.template) {
             fetch(`https://templater-api.hacker22.repl.co/api/templates/${router.query.template[0]}/${router.query.template[1]}`)
                 .then(d => d.json())
                 .then(d => setData(d))
-                .catch(d => console.log(404))
+                .catch(d => setFound("404 Not Found"))
         }
     }, router.query.template)
     if (templateData) {
@@ -67,7 +68,7 @@ const Templates = props => {
         )
     } else {
         return (
-            <Text>404 not found</Text>
+            <Heading mx="auto" my="20px" color="primary">{notFound}</Heading>
         )
     }
 }
