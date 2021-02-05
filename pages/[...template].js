@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { jsx } from 'theme-ui'
+import { jsx, useColorMode } from 'theme-ui'
 import { useState, useEffect } from "react"
 import { Flex, Text, Heading, Image } from "rebass"
 import { useRouter } from 'next/router'
@@ -8,10 +8,12 @@ import marked from "marked"
 import dompurify from "dompurify"
 import Head from "next/head"
 import Link from "next/link"
+import { CssBaseline, GeistProvider, Tree } from '@geist-ui/react'
 
 const Templates = props => {
     const router = useRouter()
     const [templateData, setData] = useState();
+    const [colorMode, setColorMode] = useColorMode()
     const [notFound, setFound] = useState("");
     useEffect(() => {
         if (router.query.template) {
@@ -22,6 +24,37 @@ const Templates = props => {
         }
     }, router.query.template)
     if (templateData) {
+
+
+        let result = [];
+        let level = { result };
+
+        templateData.files.forEach(path => {
+            path.split('/').reduce((r, name, i, a) => {
+                if (!r[name]) {
+                    r[name] = { result: [] };
+                    r.result.push({ name, children: r[name].result })
+                }
+
+                return r[name];
+            }, level)
+        })
+        //result = result[0].children
+        let mapFiles = f => {
+            if (!f.name) {
+                console.log(f)
+                if (f.children.length > 0) {
+                    return f.children.map(mapFiles)
+                }
+                return null
+            }
+            if (f.name.includes(".")) {
+                return <Tree.File name={f.name} />
+            } else {
+                return <Tree.Folder name={f.name}>{f.children.map(mapFiles)}</Tree.Folder>
+            }
+        }
+
         return (
             <Flex w="100vw" flexDirection="column">
                 <Head>
@@ -52,7 +85,14 @@ const Templates = props => {
                     bg: "muted",
                     flexDirection: "column",
                 }}
-                    dangerouslySetInnerHTML={{ __html: templateData.files ? templateData.files.join("<br/>") : "" }} />
+                >
+                    <GeistProvider theme={{ type: colorMode !== "dark" ? "light" : "dark" }}>
+                        <CssBaseline />
+                        <Tree>
+                            {mapFiles(result[0])}
+                        </Tree>
+                    </GeistProvider>
+                </Flex>
                 <Flex sx={{
                     width: ["90vw", "75vw", "60vw"],
                     mx: "auto",
