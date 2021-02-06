@@ -5,3 +5,5 @@ firebase_service.json
 .env
 .vscode
 .vercel
+.pnp.js
+.yarn
