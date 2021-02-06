@@ -44,7 +44,8 @@ export default class extends React.Component {
                                 ":hover": {
                                     cursor: "pointer",
                                     color: "secondary"
-                                }
+                                },
+                                m: "10px"
                             }}>
                                 <Image m="10px" sx={{ borderRadius: "500px" }} my="auto" src={v.avatar} height="75%" />
                                 <Text fontWeight={700} my="auto">@{Object.keys(this.state.users)[i]}</Text>
