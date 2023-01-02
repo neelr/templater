@@ -10,7 +10,7 @@ const UserPage = props => {
     let [search, setSearch] = useState("pending")
     const [notFound, setFound] = useState("");
     useEffect(() => {
-        fetch(`https://templater-api.hacker22.repl.co/api/query`, {
+        fetch(`https://plate.neelr.dev/api/query`, {
             method: "POST",
             body: router.query.q
         })
