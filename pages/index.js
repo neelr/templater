@@ -9,7 +9,7 @@ export default class extends React.Component {
         users: {}
     }
     componentDidMount() {
-        fetch("https://templater-api.hacker22.repl.co/api/users")
+        fetch("https://plate.neelr.dev/api/users")
             .then(res => res.json())
             .then(json => {
                 console.log(json)
