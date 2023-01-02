@@ -8,7 +8,7 @@ import (
 func InitSettings() {
 
 	// Which url to make server requests to
-	os.Setenv("URL", "https://templater-api--hacker22.repl.co")
+	os.Setenv("URL", "https://plate.neelr.dev")
 
 	// Firebase URL
 	os.Setenv("FIREBASE", "templater-9289d.appspot.com")
