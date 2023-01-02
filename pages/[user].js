@@ -10,7 +10,7 @@ const UserPage = props => {
     const [userData, setData] = useState();
     const [notFound, setFound] = useState("");
     useEffect(() => {
-        fetch(`https://templater-api.hacker22.repl.co/api/user/${router.query.user}`)
+        fetch(`https://plate.neelr.dev/api/user/${router.query.user}`)
             .then(d => d.json())
             .then(d => setData(d))
             .catch(d => setFound("404 Not Found"))
