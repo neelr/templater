@@ -2,9 +2,9 @@
 
 <p align="center">
     <a href="https://templaterx.now.sh" alt="Templates">
-        <img src="https://img.shields.io/endpoint?url=https://templater-api.hacker22.repl.co/api/badges/templates&label=Templates" /></a>
+        <img src="https://img.shields.io/endpoint?url=https://plate.neelr.dev/api/badges/templates&label=Templates" /></a>
   <a href="https://templaterx.now.sh" alt="Server">
-        <img src="https://img.shields.io/endpoint?url=https://templater-api.hacker22.repl.co/api/badges&label=Server%20Status" /></a>
+        <img src="https://img.shields.io/endpoint?url=https://plate.neelr.dev/api/badges&label=Server%20Status" /></a>
   <a href="https://opensource.org/licenses/MIT" alt="LICENSE">
         <img src="https://badgen.net/github/license/neelr/templater" /></a>
     <a href="https://github.com/neelr/templater/commits/master" alt="Commits">
